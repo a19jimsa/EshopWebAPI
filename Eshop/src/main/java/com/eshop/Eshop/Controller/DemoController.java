@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @CrossOrigin
@@ -37,6 +38,7 @@ public class DemoController {
     private AddressRepository addressRepository;
     @Autowired
     private OrderRepository orderRepository;
+    @Autowired OrderItemRepository orderItemRepository;
 
     @GetMapping("/api/categories")
     public Iterable<Category> getCategories(){
@@ -84,12 +86,8 @@ public class DemoController {
 
     @PostMapping("/api/customer/add")
     public Customer addCustomer(@RequestBody Customer customer){
-        if(customerRepository.existsByEmail(customer.getEmail())){
-            return customer;
-        }
         addressRepository.save(customer.getAddress());
-        customerRepository.save(customer);
-        return customer;
+        return customerRepository.save(customer);
     }
 
     @GetMapping("/api/customers")
@@ -102,8 +100,10 @@ public class DemoController {
         return customerRepository.findCustomerById(id);
     }
 
-    @GetMapping("/api/images/{id}")
-    public Image getThumbnail(@PathVariable Integer id){return imageRepository.findImageById(id);}
+    @GetMapping("/api/image/")
+    public Image getThumbnail(@RequestBody Product product){
+        return product.getImages().get(0);
+    }
 
     @GetMapping("/api/product/images")
     public List<Image> getImages(@RequestParam Integer id){
@@ -112,14 +112,19 @@ public class DemoController {
     }
 
     @PostMapping("/api/order/add")
-    public Order addOrder(@RequestBody Order order){
+    public Iterable<OrderItem> addOrder(@RequestBody Order order){
         order.setDate(LocalDate.now());
-        customerRepository.findAll().forEach(customer -> {
-            if(customer.getEmail().equals(order.getCustomer().getEmail())){
-                order.setCustomer(customer);
-            }
-        });
-        return orderRepository.save(order);
+        order.setStatus("Ej behandlad");
+        Order newOrder = orderRepository.save(order);
+        for(int i = 0; i < order.getOrderItems().size(); i++){
+            OrderItem orderItem = new OrderItem();
+            orderItem.setProduct(order.getOrderItems().get(i).getProduct());
+            orderItem.setPrice(order.getOrderItems().get(i).getPrice());
+            orderItem.setQuantity(order.getOrderItems().get(i).getQuantity());
+            orderItem.setOrder(newOrder);
+            orderItemRepository.save(orderItem);
+        }
+        return order.getOrderItems();
     }
 
     @GetMapping("/api/orders")

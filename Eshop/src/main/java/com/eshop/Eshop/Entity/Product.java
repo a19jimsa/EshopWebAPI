@@ -1,7 +1,10 @@
 package com.eshop.Eshop.Entity;
 
 import jakarta.persistence.*;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.lang.NonNull;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -15,25 +18,16 @@ public class Product {
     private String description;
     private double price;
     private int inventory_amount;
-
     @ManyToOne
     private Category category;
-
     @OneToMany
-    private Set<Image> images = new HashSet<>();
-
+    private List<Image> images = new ArrayList<>();
     //Setter and getters
-    public Set<Image> getImages() {
+    public List<Image> getImages() {
         return images;
     }
-    public void setImages(Set<Image> images) {
+    public void setImages(List<Image> images) {
         this.images = images;
-    }
-    public void setCategory(Category category) {
-        this.category = category;
-    }
-    public Category getCategory() {
-        return category;
     }
     public String getDescription() {
         return description;
@@ -64,5 +58,11 @@ public class Product {
     }
     public void setPrice(double price) {
         this.price = price;
+    }
+    public void setCategory( Category category) {
+        this.category = category;
+    }
+    public Category getCategory() {
+        return category;
     }
 }

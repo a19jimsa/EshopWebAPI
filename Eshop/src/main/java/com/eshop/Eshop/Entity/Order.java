@@ -13,18 +13,17 @@ public class Order {
     private Integer id;
     private LocalDate date;
     private String status;
+
+    @OneToMany(mappedBy = "order")
+    List<OrderItem> orderItems;
+
     @ManyToOne
     private Customer customer;
     public Customer getCustomer() {
         return customer;
     }
-    @OneToMany(mappedBy = "order")
-    private List<OrderItem> orderItems;
-    public void setOrderItems(List<OrderItem> orderItems) {
-        this.orderItems = orderItems;
-    }
-    public List<OrderItem> getOrderItems() {
-        return orderItems;
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
     }
     public String getStatus() {
         return status;

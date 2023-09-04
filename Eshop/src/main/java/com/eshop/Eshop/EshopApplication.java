@@ -1,23 +1,34 @@
 package com.eshop.Eshop;
 
-import com.eshop.Eshop.Entity.Category;
-import com.eshop.Eshop.Repository.CategoryRepository;
+import com.eshop.Eshop.Entity.*;
+import com.eshop.Eshop.Repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import java.time.LocalDate;
 
 
 @SpringBootApplication
 public class EshopApplication implements CommandLineRunner {
 
 	private final CategoryRepository categoryRepository;
+	private final ProductRepository productRepository;
+	private final CustomerRepository customerRepository;
+	private final OrderRepository orderRepository;
 
+	private final OrderItemRepository orderItemRepository;
+	private final UserRepository userRepository;
 	@Autowired
-	public EshopApplication(CategoryRepository categoryRepository){
+	public EshopApplication(CategoryRepository categoryRepository, ProductRepository productRepository, CustomerRepository customerRepository, OrderRepository orderRepository, OrderRepository orderRepository1, OrderItemRepository orderItemRepository, UserRepository userRepository){
 		this.categoryRepository = categoryRepository;
+		this.productRepository = productRepository;
+		this.customerRepository = customerRepository;
+		this.orderRepository = orderRepository;
+		this.orderItemRepository = orderItemRepository;
+		this.userRepository = userRepository;
 	}
-
 
 	public static void main(String[] args) {
 		SpringApplication.run(EshopApplication.class, args);
@@ -28,5 +39,31 @@ public class EshopApplication implements CommandLineRunner {
 		Category category = new Category();
 		category.setName("Underkläder");
 		categoryRepository.save(category);
+		Product product = new Product();
+		product.setCategory(category);
+		product.setDescription("bajs");
+		product.setPrice(10);
+		product.setInventory_amount(10);
+		product.setName("Bikini");
+		Product product1 = productRepository.save(product);
+		Customer customer = new Customer();
+		customer.setEmail("few@gre.se");
+		customer.setFirstName("Bajs");
+		customer.setLastName("Korv");
+		customer.setPhone("00000");
+		Customer newCustomer = customerRepository.save(customer);
+		Order order = new Order();
+		order.setCustomer(newCustomer);
+		order.setDate(LocalDate.now());
+		order.setStatus("Ej behandlad");
+		Order newOrder= orderRepository.save(order);
+		OrderItem orderItem = new OrderItem();
+		orderItem.setProduct(product1);
+		orderItem.setOrder(newOrder);
+		orderItemRepository.save(orderItem);
+		User user = new User();
+		user.setName("Admin");
+		user.setPassword("Bajskorv");
+		userRepository.save(user);
 	}
 }

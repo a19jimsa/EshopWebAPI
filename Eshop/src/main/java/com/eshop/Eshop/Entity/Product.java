@@ -20,6 +20,10 @@ public class Product {
     private int inventory_amount;
     @ManyToOne
     private Category category;
+
+    @OneToMany(mappedBy = "product")
+    private List<OrderItem> orderItems;
+
     @OneToMany
     private List<Image> images = new ArrayList<>();
     //Setter and getters

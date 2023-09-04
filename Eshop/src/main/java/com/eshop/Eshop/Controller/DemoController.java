@@ -3,16 +3,13 @@ package com.eshop.Eshop.Controller;
 import com.eshop.Eshop.Entity.*;
 import com.eshop.Eshop.Repository.*;
 import com.eshop.Eshop.Service.ImageService;
-import jakarta.websocket.server.PathParam;
 import org.aspectj.weaver.ast.Or;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -112,24 +109,27 @@ public class DemoController {
     }
 
     @PostMapping("/api/order/add")
-    public Iterable<OrderItem> addOrder(@RequestBody Order order){
+    public Iterable<OrderItem> addOrder(@RequestBody RequestData requestData){
+        Customer customer = requestData.getCustomer();
+        List<Product> products = requestData.getProductList();
+        List<OrderItem> orderItems = new ArrayList<>();
+        Order order = new Order();
+        order.setCustomer(customer);
         order.setDate(LocalDate.now());
         order.setStatus("Ej behandlad");
         Order newOrder = orderRepository.save(order);
-        for(int i = 0; i < order.getOrderItems().size(); i++){
+        for (Product product : products) {
             OrderItem orderItem = new OrderItem();
-            orderItem.setProduct(order.getOrderItems().get(i).getProduct());
-            orderItem.setPrice(order.getOrderItems().get(i).getPrice());
-            orderItem.setQuantity(order.getOrderItems().get(i).getQuantity());
             orderItem.setOrder(newOrder);
-            orderItemRepository.save(orderItem);
+            orderItem.setProduct(product);
+            orderItems.add(orderItem);
         }
-        return order.getOrderItems();
+        return orderItemRepository.saveAll(orderItems);
     }
 
     @GetMapping("/api/orders")
-    public Iterable<Order> getOrders(){
-        return orderRepository.findAll();
+    public Iterable<OrderItem> getOrders(){
+        return orderItemRepository.findAll();
     }
 
     @GetMapping("/api/order/{id}")

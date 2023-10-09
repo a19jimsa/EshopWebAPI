@@ -13,10 +13,8 @@ public class Order {
     private Integer id;
     private LocalDate date;
     private String status;
-
     @OneToMany(mappedBy = "order")
     List<OrderItem> orderItems;
-
     @ManyToOne
     private Customer customer;
     public Customer getCustomer() {

@@ -12,12 +12,10 @@ import java.time.LocalDate;
 
 @SpringBootApplication
 public class EshopApplication implements CommandLineRunner {
-
 	private final CategoryRepository categoryRepository;
 	private final ProductRepository productRepository;
 	private final CustomerRepository customerRepository;
 	private final OrderRepository orderRepository;
-
 	private final OrderItemRepository orderItemRepository;
 	private final UserRepository userRepository;
 	@Autowired
@@ -36,15 +34,20 @@ public class EshopApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
+		Category newCategory = new Category();
+		newCategory.setCategoryName("Dam");
+		newCategory.setCategoryDescription("Detta är en kategori för kvinnor");
+		categoryRepository.save(newCategory);
 		Category category = new Category();
-		category.setName("Underkläder");
+		category.setCategoryName("Herr");
+		category.setCategoryDescription("Detta är en kategori för herrar");
 		categoryRepository.save(category);
 		Product product = new Product();
-		product.setCategory(category);
-		product.setDescription("bajs");
+		product.setDescription("Detta är en snygg tröja");
 		product.setPrice(10);
 		product.setInventory_amount(10);
-		product.setName("Bikini");
+		product.setName("Tröja");
+		product.setCategory(category);
 		Product product1 = productRepository.save(product);
 		Customer customer = new Customer();
 		customer.setEmail("few@gre.se");
@@ -57,9 +60,7 @@ public class EshopApplication implements CommandLineRunner {
 		order.setDate(LocalDate.now());
 		order.setStatus("Ej behandlad");
 		Order newOrder= orderRepository.save(order);
-		OrderItem orderItem = new OrderItem();
-		orderItem.setProduct(product1);
-		orderItem.setOrder(newOrder);
+		OrderItem orderItem = new OrderItem(newOrder, product1);
 		orderItemRepository.save(orderItem);
 		User user = new User();
 		user.setName("Admin");

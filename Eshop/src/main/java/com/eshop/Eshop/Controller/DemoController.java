@@ -2,8 +2,8 @@ package com.eshop.Eshop.Controller;
 
 import com.eshop.Eshop.Entity.*;
 import com.eshop.Eshop.Repository.*;
+import com.eshop.Eshop.Service.CategoryService;
 import com.eshop.Eshop.Service.ImageService;
-import org.aspectj.weaver.ast.Or;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -35,18 +35,18 @@ public class DemoController {
     private AddressRepository addressRepository;
     @Autowired
     private OrderRepository orderRepository;
-    @Autowired OrderItemRepository orderItemRepository;
-
+    @Autowired
+    OrderItemRepository orderItemRepository;
+    @Autowired
+    CategoryService categoryService;
     @GetMapping("/api/categories")
     public Iterable<Category> getCategories(){
         return categoryRepository.findAll();
     }
-
     @GetMapping("/api/category")
     public Category getCategory(@RequestParam Integer id){
         return categoryRepository.findCategoryById(id);
     }
-
     @PostMapping("/api/add")
     public ResponseEntity<Product> addProduct(@RequestBody Product product){
         for(int i = 0; i < product.getImages().size(); i++){
@@ -58,7 +58,6 @@ public class DemoController {
         productRepository.save(product);
         return ResponseEntity.ok(productRepository.findProductById(product.getId()));
     }
-
     @GetMapping("/api/product/images/{filename:.+}")
     public ResponseEntity<Resource> getImage(@PathVariable String filename) throws IOException{
         String imageDir = "C:/Users/Jimmy/Desktop/server";
@@ -119,21 +118,33 @@ public class DemoController {
         order.setStatus("Ej behandlad");
         Order newOrder = orderRepository.save(order);
         for (Product product : products) {
-            OrderItem orderItem = new OrderItem();
-            orderItem.setOrder(newOrder);
-            orderItem.setProduct(product);
+            OrderItem orderItem = new OrderItem(newOrder, product);
             orderItems.add(orderItem);
         }
         return orderItemRepository.saveAll(orderItems);
     }
 
     @GetMapping("/api/orders")
-    public Iterable<OrderItem> getOrders(){
-        return orderItemRepository.findAll();
+    public Iterable<Order> getOrders(){
+        return orderRepository.findAll();
     }
 
     @GetMapping("/api/order/{id}")
     public Order getOrder(@PathVariable Integer id){
         return orderRepository.findOrderById(id);
+    }
+
+    @GetMapping("/api/category/{name}")
+    public Iterable<Product> getProductsInCategory(@PathVariable String name){
+        Category category = categoryRepository.findCategoryByCategoryName(name);
+        return categoryService.getAllSubcategories(category.getId());
+    }
+    @GetMapping("/api/breadcrumbs/{name}")
+    public List<Category> getBreadcrumbs(@PathVariable String name){
+        return categoryService.getParentCategories(name);
+    }
+    @GetMapping("/api/categories/{name}")
+    public Category getCategories(@PathVariable String name){
+        return categoryService.getAllParentCategories(name);
     }
 }

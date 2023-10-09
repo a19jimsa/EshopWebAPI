@@ -12,18 +12,22 @@ import java.util.Set;
 @Entity
 public class Product {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
     private String name;
     private String description;
     private double price;
-    private int inventory_amount;
+    private int stock;
     @ManyToOne
     private Category category;
-
+    public int getStock() {
+        return stock;
+    }
+    public void setStock(int stock) {
+        this.stock = stock;
+    }
     @OneToMany(mappedBy = "product")
     private List<OrderItem> orderItems;
-
     @OneToMany
     private List<Image> images = new ArrayList<>();
     //Setter and getters
@@ -52,13 +56,13 @@ public class Product {
         return price;
     }
     public int getInventory_amount() {
-        return inventory_amount;
+        return stock;
     }
     public void setDescription(String description) {
         this.description = description;
     }
-    public void setInventory_amount(int inventory_amount) {
-        this.inventory_amount = inventory_amount;
+    public void setInventory_amount(int stock) {
+        this.stock = stock;
     }
     public void setPrice(double price) {
         this.price = price;
